@@ -4,7 +4,10 @@
   "description": "whbsale",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "pm2 start app.js -i 4 --name whbsale",
+    "stop": "pm2 stop whbsale",
+    "delete": "pm2 delete whbsale"
   },
   "author": "cjfigueiras",
   "license": "ISC",
