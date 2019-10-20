@@ -13,7 +13,7 @@ const connect = (cb) => {
     amqp.connect(`amqp://${process.env.RABBIT_USER}:${process.env.RABBIT_PASSWORD}@${process.env.RABBIT_HOST}:${process.env.RABBIT_PORT}?heartbeat=60`, function (err, conn) {
         if (err) {
             console.error("[AMQP]", err.message);
-            return setTimeout(start, 1000);
+            return setTimeout(connect, 1000);
         }
         conn.on("error", function (err) {
             if (err.message !== "Connection closing") {
