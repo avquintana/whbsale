@@ -1,0 +1,11 @@
+*.log
+node_modules
+npm-debug.*
+.DS_Store
+.vscode
+yarn-error.log
+debug.log
+coverage
+.idea/*
+logs/
+package-lock.json
