@@ -1,8 +1,9 @@
 var dotenv = require('dotenv');
 const { connect, publish } = require('./src/amqp')
+
+dotenv.config();
 // if the connection is closed or fails to be established at all, we will reconnect
-function start() {
-  dotenv.config();
+function start() {  
   connect(work);
 }
 
@@ -12,7 +13,7 @@ const work = (msg, cb) => {
 }
 
 setInterval(function() {
-  publish("", "jobs", new Buffer("work work work"));
+  publish("", process.env.RABBIT_QUEUE, new Buffer("work work work"));
 }, 1000);
 
 start();

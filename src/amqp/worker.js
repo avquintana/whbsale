@@ -14,9 +14,9 @@ const startWorker = (conn, cb) => {
             console.log("[AMQP] channel closed");
         });
         ch.prefetch(10);
-        ch.assertQueue("jobs", { durable: true }, function (err, _ok) {
+        ch.assertQueue(process.env.RABBIT_QUEUE, { durable: true }, function (err, _ok) {
             if (closeOnErr(err)) return;
-            ch.consume("jobs", processMsg, { noAck: false });
+            ch.consume(process.env.RABBIT_QUEUE, processMsg, { noAck: false });
             console.log("Worker is started");
         });
 
