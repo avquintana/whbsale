@@ -1,5 +1,6 @@
 var dotenv = require('dotenv');
 const { connect, publish } = require('./src/amqp');
+const { processWebhook } = require('./src/webhook.js')
 const bodyParser = require('body-parser');
 var express = require('express');
 
@@ -13,9 +14,10 @@ function upRabbitServiceConnection() {
   connect(processMsg);
 }
 
-const processMsg = (msg, cb) => {
-  console.log('Got msg', JSON.parse(msg.content.toString()));
-  cb(true);
+const processMsg = (msg, ack) => {
+  console.log('Received msg', msg.content.toString());
+  const webhook = JSON.parse(msg.content.toString());
+  processWebhook(webhook, ack);
 }
 
 app.post('/', function (req, res) {
