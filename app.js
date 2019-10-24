@@ -1,19 +1,29 @@
 var dotenv = require('dotenv');
-const { connect, publish } = require('./src/amqp')
+const { connect, publish } = require('./src/amqp');
+const bodyParser = require('body-parser');
+var express = require('express');
+
+var app = express();
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
 dotenv.config();
 // if the connection is closed or fails to be established at all, we will reconnect
-function start() {  
-  connect(work);
+function upRabbitServiceConnection() {  
+  connect(processMsg);
 }
 
-const work = (msg, cb) => {
-  console.log("Got msg", msg.content.toString());
+const processMsg = (msg, cb) => {
+  console.log('Got msg', JSON.parse(msg.content.toString()));
   cb(true);
 }
 
-setInterval(function() {
-  publish("", process.env.RABBIT_QUEUE, new Buffer("work work work"));
-}, 1000);
+app.post('/', function (req, res) {
+  publish('', process.env.RABBIT_QUEUE, new Buffer(JSON.stringify(req.body)));
+  res.send('Your request will be process soon!');
+});
 
-start();
+app.listen(process.env.APP_PORT, function () {
+  upRabbitServiceConnection();
+  console.log(`App listening on port ${process.env.APP_PORT}!`);
+});
