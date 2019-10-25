@@ -13,13 +13,36 @@ var pool = mysql.createPool({
 });
 
 const query = (sql, callback) => {
-    console.log('SQL', sql);
     pool.query(sql, callback);
 }
 
-const select = (table, field, value) => {
+const select = (table, whereFields, whereValues) => {
     return new Promise((resolve, reject) => {
-        query(`SELECT * FROM ${table} WHERE ${field} = ${value}`, function(err, result) {
+        if(!Array.isArray(whereFields)) {
+            whereFields = [whereFields];
+            whereValues = [whereValues];
+        }
+        let sql = `SELECT * FROM ${table}`;
+        whereFields.forEach((whereField, index) => {
+            const whereValue = whereValues[index];
+            if(index === 0) sql = `${sql} WHERE ${whereField} = ${whereValue}`;
+            else sql = `${sql} AND ${whereField} = ${whereValue}`;
+        });
+        query(sql, function(err, result) {
+            if(err) reject(err);
+            resolve(result);
+        });
+    });    
+}
+
+const insert = (table, fields, values) => {
+    return new Promise((resolve, reject) => {
+        if(!Array.isArray(fields)) {
+            fields = [fields];
+            values = [values];
+        }
+        let sql = `INSERT INTO ${table} (${fields.join(',')}) VALUES (${values.join(',')})`;
+        query(sql, function(err, result) {
             if(err) reject(err);
             resolve(result);
         });
@@ -28,5 +51,6 @@ const select = (table, field, value) => {
 
 module.exports = {
     query,
-    select
+    select,
+    insert
 }
