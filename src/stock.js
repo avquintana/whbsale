@@ -1,11 +1,11 @@
 const { logIntegrationAction } = require('./integration-log')
 const prestashop = require('./api/prestashop');
 const bsale = require('./api/bsale');
-const cscart = require('./api/cscartapi');
+const cscart = require('./api/cscart');
 const woocommerce = require('./api/woocommerce');
-const shopify = require('./api/woocommerce');
+const shopify = require('./api/shopify');
 
-const processStock = (webhook, company) => {
+const updateStocks = (webhook, company) => {
     return new Promise((resolve, reject) => {
         if (company.stocks === 0) {
             reject('Cliente no procesa stocks');
@@ -54,26 +54,16 @@ const processStock = (webhook, company) => {
                 // 'api_key' => $cs_key,
                 // 'user_login' => $email,
                 // 'api_url' => $url
-
-                cscart.get('products', {
-                    pcode: reference
-                }).then(response => {
-                    cscart.update(`products/${response.products[0].product_id}`, {
-                        amount: stocks
-                    }).then(() => {
-                        logIntegrationAction(webhook.cpnId, 'Cscart Stocks', 'Cscart', details, true).then(() => {
-                            resolve();
-                        });
-                    }).catch(error => {
-                        logIntegrationAction(webhook.cpnId, 'Cscart Stocks', 'Cscart', details, false).then(() => {
-                            reject();
-                        });
+                cscart.setProductQuantity(stocks, reference).then(() => {
+                    logIntegrationAction(webhook.cpnId, `Cscart Stocks`, 'Cscart', details, true).then(() => {
+                        resolve();
                     });
-                }).catch(error => {
-                    logIntegrationAction(webhook.cpnId, 'Cscart Stocks', 'Cscart', details, false).then(() => {
+                }).catch(() => {
+                    logIntegrationAction(webhook.cpnId, `Cscart Stocks`, 'Cscart', details, false).then(() => {
                         reject();
                     });
-                })
+                });
+
             }
 
             if (company.ecommerce === 'Wordpress') {
@@ -88,36 +78,15 @@ const processStock = (webhook, company) => {
                 // 				'version' => 'wc/v2',
                 // 			]
                 // 		);
-                woocommerce.get('products', {
-                    'sku': reference
-                }).then(products => {
-                    if (products.length > 0) {
-                        const product = products[0];
-                        let url = `products/${product.id}`;
-                        if (product.type !== 'simple') {
-                            url = `products/${product.parent_id}/variations/${product.id}`;
-                        }
-                        woocommerce.put(url, {
-                            managing_stock: true,
-                            in_stock: true,
-                            stock_quantity: stocks
-                        }).then(() => {
-                            logIntegrationAction(webhook.cpnId, 'Wordpress Stocks', 'Wordpress', details, true).then(() => {
-                                resolve();
-                            });
-                        }).catch(error => {
-                            logIntegrationAction(webhook.cpnId, 'Wordpress Stocks', 'Wordpress', details, false).then(() => {
-                                reject();
-                            });
-                        });
-                    } else {
+                woocommerce.setProductQuantity(stocks, reference).then(() => {
+                    logIntegrationAction(webhook.cpnId, `Wordpress Stocks`, 'Wordpress', details, true).then(() => {
                         resolve();
-                    }
-                }).catch(error => {
-                    logIntegrationAction(webhook.cpnId, 'Wordpress Stocks', 'Wordpress', details, false).then(() => {
+                    });
+                }).catch(() => {
+                    logIntegrationAction(webhook.cpnId, `Wordpress Stocks`, 'Wordpress', details, false).then(() => {
                         reject();
                     });
-                })
+                });
             }
 
             if (company.ecommerce === 'Shopify') {
@@ -129,12 +98,20 @@ const processStock = (webhook, company) => {
 						);
                         $bsale->set_product_stocks_shopify($stocks, $url, $webservice, $variantId, $referencia, $llaves, $varBsales['cpnId'],$conexion);
                          */
-                // shopify.setProductQuantity()
+                shopify.setProductQuantity(webhook.cpnId, stocks, reference).then(() => {
+                    logIntegrationAction(webhook.cpnId, `Shopify Stocks`, 'Shopify', details, true).then(() => {
+                        resolve();
+                    });
+                }).catch(() => {
+                    logIntegrationAction(webhook.cpnId, `Shopify Stocks`, 'Shopify', details, false).then(() => {
+                        reject();
+                    });
+                });
             }
         }
     });
 }
 
 module.exports = {
-    processStock
+    updateStocks
 }

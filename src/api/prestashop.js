@@ -1,12 +1,12 @@
 const setProductQuantityVersion16 = (stocks, company, reference) => {
     return new Promise((resolve, reject) => {
-
+        resolve();
     });
 }
 
 const setProductQuantityVersion17 = (stocks, company, reference) => {
     return new Promise((resolve, reject) => {
-
+        resolve();
     });
 }
 
@@ -29,5 +29,5 @@ const setProductQuantity = (version, stocks, company, reference) => {
 }
 
 module.exports = {
-    setProductQuantityPrestashop,
+    setProductQuantity
 }
