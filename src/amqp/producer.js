@@ -5,22 +5,28 @@ var offlinePubQueue = [];
 var amqpConn = null;
 
 const startPublisher = (conn) => {
-    amqpConn = conn;
-    amqpConn.createConfirmChannel(function (err, ch) {
-        if (closeOnErr(err, amqpConn)) return;
-        ch.on("error", function (err) {
-            console.error("[AMQP] channel error", err.message);
-        });
-        ch.on("close", function () {
-            console.log("[AMQP] channel closed");
-        });
+    return new Promise((resolve, reject) => {
+        amqpConn = conn;
+        amqpConn.createConfirmChannel(function (err, ch) {
+            if (closeOnErr(err, amqpConn)){
+                reject(err);
+                return;
+            } 
+            ch.on("error", function (err) {
+                console.error("[AMQP] channel error", err.message);
+            });
+            ch.on("close", function () {
+                console.log("[AMQP] channel closed");
+            });
 
-        pubChannel = ch;
-        while (true) {
-            var m = offlinePubQueue.shift();
-            if (!m) break;
-            publish(m[0], m[1], m[2]);
-        }
+            pubChannel = ch;
+            while (true) {
+                var m = offlinePubQueue.shift();
+                if (!m) break;
+                publish(m[0], m[1], m[2]);
+            }
+            resolve();
+        });
     });
 }
 
