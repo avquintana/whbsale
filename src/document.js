@@ -17,10 +17,10 @@ const processDocuments = (webhook, company) => {
         if (!company.token) {
             reject('Empty token');
         }
-        let documents = bsale.getOne(`documents/${webhook.resourceId}/details.json?limit=100`);
-        let doc = bsale.getOne(`documents/${webhook.resourceId}.json`);
+        let documents = bsale.get(`documents/${webhook.resourceId}/details.json?limit=100`);
+        let doc = bsale.get(`documents/${webhook.resourceId}.json`);
         const doc_url = doc.document_type.href.substr(24, 100);
-        const document_type = bsale.getOne(doc_url);
+        const document_type = bsale.get(doc_url);
 
         let resta = 0;
         if (document_type.id === 7 && webhook.cpnId === 8016 && company.oficina === 2) {

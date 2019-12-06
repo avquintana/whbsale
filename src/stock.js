@@ -25,8 +25,9 @@ const processStocks = (webhook, company) => {
 }
 
 const updateStock = (webhook, company, variantId, resta, isDocument = false) => {
-    let variant = bsale.getOne(`stocks.json?variantid=${variantId}`);
-    let ref = bsale.getOne(`variants/${variantId}.json`);
+    bsale.setToken(company.token);
+    let variant = bsale.get(`stocks.json?variantid=${variantId}`);
+    let ref = bsale.get(`variants/${variantId}.json`);
     let reference = ref.code;
     if (webhook.cpnId === 25913) {
         reference = ref.barCode;
