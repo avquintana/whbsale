@@ -109,15 +109,7 @@ const updateStock = (webhook, company, variantId, resta, isDocument = false) => 
     }
 
     if (company.ecommerce === 'Shopify') {
-        // TODO: set api credentials
-        /*$llaves = array(
-                    'ShopUrl' => $url,
-                    'ApiKey' => $email,
-                    'Password' =>  $cs_key,
-                );
-                $bsale->set_product_stocks_shopify($stocks, $url, $webservice, $variantId, $referencia, $llaves, $varBsales['cpnId'],$conexion);
-                 */
-        shopify.setProductQuantity(webhook.cpnId, stocks, reference).then(() => {
+        shopify.setProductQuantity(webhook.cpnId, company, stocks, reference).then(() => {
             logIntegrationAction(webhook.cpnId, `Shopify Stocks`, 'Shopify', details, true).then(() => {
                 resolve();
             });
@@ -127,7 +119,6 @@ const updateStock = (webhook, company, variantId, resta, isDocument = false) => 
             });
         });
     }
-    // }
 }
 
 module.exports = {

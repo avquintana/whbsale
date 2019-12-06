@@ -1,10 +1,19 @@
 const { select } = require('../database');
+const Shopify = require('shopify-api-node');
 
-const setProductQuantity = (cpnid, stocks, reference) => {
+var shopify;
+
+const setProductQuantity = (cpnId, company, stocks, reference) => {
     return new Promise((resolve, reject) => {
-        select('shopify_ids', ['cpnid', 'sku'], [cpnid, reference]).then(product => {
-            getProduct(product.product).then(async response => {
-                updateInventories(stocks, response.variants).then(() => {
+        select('shopify_ids', ['cpnid', 'sku'], [cpnId, reference]).then(product => {
+            const url = new URL(company.url);
+            shopify = new Shopify({
+                shopName: url.hostname,
+                apiKey: company.usuario,
+                password: company.cs_key
+            });
+            shopify.product.get(product.product).then((response) => {
+                updateInventories(stocks, response.variants, reference).then(() => {
                     resolve();
                 }).catch(error => {
                     reject(error);
@@ -18,37 +27,14 @@ const setProductQuantity = (cpnid, stocks, reference) => {
     })
 }
 
-const getProduct = (product) => {
-    return new Promise((resolve, reject) => {
-        resolve({
-            variants: []
-        });
-    });
-}
-
-const getInventoryLevel = (inventory) => {
-    return new Promise((resolve, reject) => {
-        resolve([{
-            location_id: '',
-            inventory_item_id: ''
-        }]);
-    });
-}
-
-const setInventoryLevel = (inventory) => {
-    return new Promise((resolve, reject) => {
-        resolve();
-    });
-}
-
-const updateInventories = (stocks, variants) => {
+const updateInventories = (stocks, variants, reference) => {
     return Promise.all(variants.map(variant => {
         return new Promise((resolve, reject) => {
             if (variant.sku === reference) {
-                getInventoryLevel({ inventory_item_ids: variant.inventory_item_id }).then(level => {
-                    setInventoryLevel({
-                        location_id: level[0].location_id,
-                        inventory_item_id: level[0].inventory_item_id,
+                shopify.inventoryLevel.list({ inventory_item_ids: variant.inventory_item_id }).then(levels => {
+                    shopify.inventoryLevel.set({
+                        location_id: levels[0].location_id,
+                        inventory_item_id: levels[0].inventory_item_id,
                         available: stocks
                     }).then(() => {
                         resolve();
