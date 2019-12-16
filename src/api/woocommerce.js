@@ -1,8 +1,4 @@
-const get = (url, data = []) => {
-    return new Promise((resolve, reject) => {
-
-    });
-}
+var WooCommerceAPI = require('woocommerce-api');
 
 const update = (url, data = []) => {
     return new Promise((resolve, reject) => {
@@ -11,8 +7,16 @@ const update = (url, data = []) => {
 }
 
 const setProductQuantity = (stocks, reference) => {
-    return new Promise((resolve, reject) => {
-        get('products', {
+    return new Promise((resolve, reject) => {        
+
+        var WooCommerce = new WooCommerceAPI({
+            url: 'http://example.com',
+            consumerKey: 'ck_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+            consumerSecret: 'cs_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+            wpAPI: true,
+            version: 'wc/v1'
+        });
+        WooCommerce.get('products', {
             'sku': reference
         }).then(products => {
             if (products.length > 0) {

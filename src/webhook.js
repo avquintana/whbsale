@@ -1,6 +1,6 @@
 const { select } = require('./database');
-const { updateStocks } = require('./stock');
-const { updateDocuments } = require('./document');
+const { processStocks } = require('./stock');
+const { processDocuments } = require('./document');
 const { updatePrices } = require('./price');
 const { updateVariants } = require('./variant');
 
@@ -27,14 +27,14 @@ const updateCompanies = (webhook, companies) => {
 const updateCompany = (webhook, company) => {
     return new Promise((resolve, reject) => {
         if (webhook.topic === 'stock') {
-            updateStocks(webhook, company).then(result => {
+            processStocks(webhook, company).then(result => {
                 resolve(result);
             }).catch(error => {
                 reject(error);
             });
         }
         if (webhook.topic === 'document') {
-            updateDocuments(webhook, company).then(result => {
+            processDocuments(webhook, company).then(result => {
                 resolve(result);
             }).catch(error => {
                 reject(error);

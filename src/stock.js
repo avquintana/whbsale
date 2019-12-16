@@ -24,10 +24,10 @@ const processStocks = (webhook, company) => {
     });
 }
 
-const updateStock = (webhook, company, variantId, resta, isDocument = false) => {
+const updateStock = async (webhook, company, variantId, resta, isDocument = false) => {
     bsale.setToken(company.token);
-    let variant = bsale.get(`stocks.json?variantid=${variantId}`);
-    let ref = bsale.get(`variants/${variantId}.json`);
+    let variant = await bsale.get(`stocks.json?variantid=${variantId}`);
+    let ref = await bsale.get(`variants/${variantId}.json`);
     let reference = ref.code;
     if (webhook.cpnId === 25913) {
         reference = ref.barCode;
