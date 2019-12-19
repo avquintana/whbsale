@@ -7,7 +7,7 @@ const woocommerce = require('./api/woocommerce');
 const shopify = require('./api/shopify');
 
 const processDocuments = (webhook, company) => {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
         if (company.stocks === 0) {
             reject('Cliente no procesa stocks');
         }
@@ -17,13 +17,15 @@ const processDocuments = (webhook, company) => {
         if (!company.token) {
             reject('Empty token');
         }
-        let documents = bsale.get(`documents/${webhook.resourceId}/details.json?limit=100`);
-        let doc = bsale.get(`documents/${webhook.resourceId}.json`);
-        const doc_url = doc.document_type.href.substr(24, 100);
-        const document_type = bsale.get(doc_url);
-
+        bsale.setToken(company.token);
+        let documents = await bsale.get(`documents/${webhook.resourceId}/details.json?limit=100`);
+        let doc = await bsale.get(`documents/${webhook.resourceId}.json`);
+        // const doc_url = doc.document_type.href.substr(24, 100);
+        // const document_type = await bsale.get(doc_url);
+        const document_type_id = +doc.document_type.id;
+        
         let resta = 0;
-        if (document_type.id === 7 && webhook.cpnId === 8016 && company.oficina === 2) {
+        if (document_type_id === 7 && webhook.cpnId === 8016 && company.oficina === 2) {
             resta = 1;
         }
         updateDocuments(webhook, company, documents.items, resta, true).then(()=> {

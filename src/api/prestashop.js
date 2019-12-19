@@ -2,11 +2,15 @@ const api = require('prestashop-sdk-16');
 
 const setProductQuantityVersion16 = (stocks, company, reference) => {
     return new Promise((resolve, reject) => {
-        var Presta = new api({
-            connection: `https://${company.webservice}@${company.url}`
-        })
+        // var Presta = new api({
+        //     connection: `https://${company.webservice}@${url.hostname}`
+        // })
+        var Presta = new api({ 
+            storeUrl: company.url,
+            apiKey: company.webservice
+        });
         var opt = {};
-        if (url === 'https://www.chilemontana.cl') {
+        if (company.url === 'https://www.chilemontana.cl') {
             opt = {
                 filter: {
                     ean13: reference
@@ -20,7 +24,7 @@ const setProductQuantityVersion16 = (stocks, company, reference) => {
             }
         }
         Presta.get('products', opt).then(function (response) {
-            var id = response.products[0].product['id'];
+            var id = +response.prestashop.products.product.$.id;
             if (id) {
                 opt = {
                     id: id
@@ -35,6 +39,7 @@ const setProductQuantityVersion16 = (stocks, company, reference) => {
         }).catch(function (errors) {
             console.log(errors);
         });
+        resolve();
     });
 }
 

@@ -26,9 +26,19 @@ const post = (target, data = []) => {
 
         const req = https.request(options, (res) => {
             res.setEncoding('utf8');
-            res.on('data', (responseData) => {
-                console.log(`BODY: ${responseData}`);
-                resolve(responseData);
+            var body = '';
+
+            res.on('data', function (chunk) {
+                body = body + chunk;
+            });
+
+            res.on('end', function () {
+                // console.log("Body :" + body);
+                if (res.statusCode != 200) {
+                    reject("Api call failed with response code " + res.statusCode);
+                } else {
+                    resolve(JSON.parse(body));
+                }
             });
         });
 
@@ -48,7 +58,7 @@ const get = (target) => {
         const options = {
             hostname: process.env.BSALE_API_HOST,
             port: process.env.BSALE_API_PORT,
-            path: target[0] === '/' ? target : `/${target}`,
+            path: target[0] === '/' ? `/${process.env.BSALE_API_VERSION}${target}` : `/${process.env.BSALE_API_VERSION}/${target}`,
             method: 'GET',
             headers: {
                 'access_token': this.TOKEN,
@@ -58,9 +68,19 @@ const get = (target) => {
 
         const req = https.request(options, (res) => {
             res.setEncoding('utf8');
-            res.on('data', (responseData) => {
-                console.log(`BODY: ${responseData}`);
-                resolve(responseData);
+            var body = '';
+
+            res.on('data', function (chunk) {
+                body = body + chunk;
+            });
+
+            res.on('end', function () {
+                // console.log("Body :" + body);
+                if (res.statusCode != 200) {
+                    reject("Api call failed with response code " + res.statusCode);
+                } else {
+                    resolve(JSON.parse(body));
+                }
             });
         });
 
@@ -102,9 +122,19 @@ const put = (target, data = []) => {
 
         const req = https.request(options, (res) => {
             res.setEncoding('utf8');
-            res.on('data', (responseData) => {
-                console.log(`BODY: ${responseData}`);
-                resolve(responseData);
+            var body = '';
+
+            res.on('data', function (chunk) {
+                body = body + chunk;
+            });
+
+            res.on('end', function () {
+                // console.log("Body :" + body);
+                if (res.statusCode != 200) {
+                    reject("Api call failed with response code " + res.statusCode);
+                } else {
+                    resolve(JSON.parse(body));
+                }
             });
         });
 

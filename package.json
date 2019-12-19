@@ -7,7 +7,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "pm2 start app.js -i 4 --name whbsale",
     "stop": "pm2 stop whbsale",
-    "delete": "pm2 delete whbsale"
+    "delete": "pm2 delete whbsale",
+    "dev": "node app.js",
+    "debug": "nodemon --inspect app.js"
   },
   "author": "avquintana",
   "license": "ISC",
@@ -19,5 +21,8 @@
     "prestashop-sdk-16": "^0.2.6",
     "shopify-api-node": "^2.25.1",
     "woocommerce-api": "^1.5.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.2"
   }
 }
